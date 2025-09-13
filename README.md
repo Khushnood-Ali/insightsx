@@ -106,6 +106,8 @@ insightsx
 
 ## ⚙️ Setup Instructions
 
+---
+
 ### 1. Clone the Repository
 
 ```bash
