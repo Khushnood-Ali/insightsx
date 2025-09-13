@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InsightsX - Shopify Analytics & Insights Platform</title>
+    <link rel="stylesheet" href="src/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="login-header">
+                <h1>Welcome to InsightsX</h1>
+                <p>Shopify Analytics & Insights Platform</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn--primary btn--full-width">Sign In</button>
+            </form>
+            <div class="login-footer">
+                <p>Demo credentials: <strong>demo@insightsx.com</strong> / <strong>demo123</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app" class="app hidden">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <h2>InsightsX</h2>
+                    <span>Analytics Platform</span>
+                </div>
+            </div>
+            <div class="header-center">
+                <select id="tenantSelector" class="form-control tenant-selector">
+                    <option value="">Select Store...</option>
+                </select>
+            </div>
+            <div class="header-right">
+                <div class="user-profile">
+                    <span>Welcome, Demo User</span>
+                    <button id="logoutBtn" class="btn btn--outline btn--sm">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="app-layout">
+            <!-- Sidebar -->
+            <nav class="sidebar">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-view="dashboard">
+                            <span class="nav-icon">📊</span>
+                            Overview Dashboard
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-view="customers">
+                            <span class="nav-icon">👥</span>
+                            Customer Analytics
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-view="orders">
+                            <span class="nav-icon">📦</span>
+                            Order Analytics
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-view="products">
+                            <span class="nav-icon">🏷️</span>
+                            Product Performance
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-view="settings">
+                            <span class="nav-icon">⚙️</span>
+                            Settings
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Dashboard View -->
+                <div id="dashboardView" class="view active">
+                    <div class="view-header">
+                        <h1>Overview Dashboard</h1>
+                        <div class="view-actions">
+                            <button class="btn btn--outline btn--sm" id="exportBtn">Export Report</button>
+                            <button class="btn btn--primary btn--sm" id="refreshBtn">Refresh Data</button>
+                        </div>
+                    </div>
+
+                    <!-- Store Selection Message -->
+                    <div id="storeSelectionMessage" class="empty-state">
+                        <h3>Welcome to InsightsX Analytics Platform</h3>
+                        <p>Please select a store from the dropdown above to view your analytics dashboard.</p>
+                    </div>
+
+                    <!-- Dashboard Content -->
+                    <div id="dashboardContent" class="dashboard-content hidden">
+                        <!-- KPI Cards -->
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-icon">👥</div>
+                                <div class="kpi-content">
+                                    <div class="kpi-value" id="totalCustomers">0</div>
+                                    <div class="kpi-label">Total Customers</div>
+                                    <div class="kpi-trend" id="customerTrend">0%</div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon">📦</div>
+                                <div class="kpi-content">
+                                    <div class="kpi-value" id="totalOrders">0</div>
+                                    <div class="kpi-label">Total Orders</div>
+                                    <div class="kpi-trend" id="orderTrend">0%</div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon">💰</div>
+                                <div class="kpi-content">
+                                    <div class="kpi-value" id="totalRevenue">$0</div>
+                                    <div class="kpi-label">Total Revenue</div>
+                                    <div class="kpi-trend" id="revenueTrend">0%</div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon">🛒</div>
+                                <div class="kpi-content">
+                                    <div class="kpi-value" id="avgOrderValue">$0</div>
+                                    <div class="kpi-label">Avg Order Value</div>
+                                    <div class="kpi-trend" id="aovTrend">0%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Row -->
+                        <div class="charts-row">
+                            <div class="chart-card">
+                                <div class="card-header">
+                                    <h3>Revenue Trend</h3>
+                                    <select class="form-control chart-filter" id="revenueFilter">
+                                        <option value="6m">Last 6 Months</option>
+                                        <option value="3m">Last 3 Months</option>
+                                        <option value="1m">Last Month</option>
+                                    </select>
+                                </div>
+                                <div class="chart-container" style="position: relative; height: 300px;">
+                                    <canvas id="revenueChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <div class="card-header">
+                                    <h3>Order Status Distribution</h3>
+                                </div>
+                                <div class="chart-container" style="position: relative; height: 300px;">
+                                    <canvas id="orderStatusChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Row -->
+                        <div class="bottom-row">
+                            <div class="top-customers-card">
+                                <div class="card-header">
+                                    <h3>Top 5 Customers by Spend</h3>
+                                </div>
+                                <div class="customers-list" id="topCustomersList">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                            <div class="recent-orders-card">
+                                <div class="card-header">
+                                    <h3>Recent Orders</h3>
+                                </div>
+                                <div class="orders-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Customer</th>
+                                                <th>Date</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recentOrdersTable">
+                                            <!-- Populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Analytics View -->
+                <div id="customersView" class="view">
+                    <div class="view-header">
+                        <h1>Customer Analytics</h1>
+                        <div class="view-actions">
+                            <button class="btn btn--outline btn--sm">Export Customers</button>
+                        </div>
+                    </div>
+                    <div id="customerContent" class="customer-content">
+                        <div class="customer-metrics">
+                            <div class="metric-card">
+                                <h3>Customer Segmentation</h3>
+                                <div class="segment-list">
+                                    <div class="segment-item">
+                                        <span class="segment-label">VIP Customers</span>
+                                        <span class="segment-count" id="vipCount">0</span>
+                                    </div>
+                                    <div class="segment-item">
+                                        <span class="segment-label">Regular Customers</span>
+                                        <span class="segment-count" id="regularCount">0</span>
+                                    </div>
+                                    <div class="segment-item">
+                                        <span class="segment-label">New Customers</span>
+                                        <span class="segment-count" id="newCount">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="customers-table-card">
+                            <div class="card-header">
+                                <h3>Customer Details</h3>
+                                <input type="search" class="form-control search-input" placeholder="Search customers..." id="customerSearch">
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Total Spent</th>
+                                            <th>Orders</th>
+                                            <th>Location</th>
+                                            <th>Segment</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="customersTable">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders View -->
+                <div id="ordersView" class="view">
+                    <div class="view-header">
+                        <h1>Order Analytics</h1>
+                        <div class="view-actions">
+                            <select class="form-control" id="orderStatusFilter">
+                                <option value="">All Statuses</option>
+                                <option value="fulfilled">Fulfilled</option>
+                                <option value="processing">Processing</option>
+                                <option value="pending">Pending</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="order-analytics">
+                        <div class="order-stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="fulfilledOrders">0</div>
+                                <div class="stat-label">Fulfilled Orders</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="processingOrders">0</div>
+                                <div class="stat-label">Processing Orders</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="pendingOrders">0</div>
+                                <div class="stat-label">Pending Orders</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products View -->
+                <div id="productsView" class="view">
+                    <div class="view-header">
+                        <h1>Product Performance</h1>
+                        <div class="view-actions">
+                            <select class="form-control" id="categoryFilter">
+                                <option value="">All Categories</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="products-content">
+                        <div class="products-table-card">
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Price</th>
+                                            <th>Category</th>
+                                            <th>Inventory</th>
+                                            <th>Sales</th>
+                                            <th>Performance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productsTable">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings View -->
+                <div id="settingsView" class="view">
+                    <div class="view-header">
+                        <h1>Settings</h1>
+                    </div>
+                    <div class="settings-content">
+                        <div class="settings-card">
+                            <h3>Store Configuration</h3>
+                            <div class="setting-item">
+                                <label>Shopify API Connection</label>
+                                <div class="status status--success">Connected</div>
+                            </div>
+                            <div class="setting-item">
+                                <label>Data Sync Status</label>
+                                <div class="status status--success">Last synced: 2 minutes ago</div>
+                            </div>
+                            <div class="setting-item">
+                                <label>Webhook Status</label>
+                                <div class="status status--success">Active</div>
+                            </div>
+                        </div>
+                        <div class="settings-card">
+                            <h3>Multi-Tenant Management</h3>
+                            <div class="tenant-list" id="tenantList">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="src/app.js"></script>
+</body>
+</html>
