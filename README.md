@@ -217,3 +217,20 @@ Choose one of the configs:
 * **Vercel:** `vercel.json`
 
 ---
+📝 Known Limitations
+
+Shopify webhooks not fully implemented (manual sync required).
+
+Multi-tenancy tested with 3 stores; scaling needs Redis/RabbitMQ for queues.
+
+Limited metrics — can be extended with retention, churn, and product performance.
+
+🔮 Next Steps
+
+Add real-time webhooks for abandoned cart / checkout events.
+
+Improve tenant onboarding flow.
+
+Extend dashboards with segmentation and cohort analysis.
+
+Harden security with OAuth for Shopify app installation.
